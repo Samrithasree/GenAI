@@ -1,41 +1,37 @@
 import streamlit as st
 import cohere
-import os
-from dotenv import load_dotenv
 
-# Load API key from .env file
-load_dotenv()
-COHERE_API_KEY = os.getenv("COHERE_API_KEY")
-
-# ✅ Debugging - Check if the API key is loaded
-if not COHERE_API_KEY:
-    st.error("Cohere API Key not found. Please check your .env file.")
-else:
-    st.success("API Key Loaded Successfully")
+# Replace with your real Cohere API key
+API_KEY = "DsRmc5CjA70ZOo1BVBXHRjRwOL9rjCNV9uQgSkxV"
 
 # Initialize Cohere client
-co = cohere.Client(COHERE_API_KEY)
+co = cohere.Client(API_KEY)
 
-# Streamlit UI
-st.title("🤖 Cohere Chatbot")
-st.markdown("Ask anything and get intelligent responses powered by Cohere's AI.")
+st.title("📝 Text Summarization with Cohere")
+st.markdown("Summarize large texts quickly using Cohere's AI model.")
 
-# Input area for questions
-question = st.text_area("Enter your question:", height=150)
+# Text input
+input_text = st.text_area("Enter the text you want to summarize:", height=250)
 
-# Button to trigger API call
-if st.button("Ask"):
-    if not question.strip():
-        st.warning("Please enter a question to ask.")
+# Select summary length
+summary_length = st.selectbox("Choose summary length:", ["short", "medium", "long"])
+
+# Select format
+summary_format = st.selectbox("Choose format:", ["paragraph", "bullets"])
+
+if st.button("Summarize"):
+    if input_text.strip() == "":
+        st.warning("Please enter some text to summarize.")
     else:
-        with st.spinner("Generating response..."):
+        with st.spinner("Summarizing..."):
             try:
-                response = co.chat(
-                    model='command-xlarge-nightly',
-                    message=question,   # <--- Fixed this parameter
-                    temperature=0.5
+                response = co.summarize(
+                    text=input_text,
+                    length=summary_length,
+                    format=summary_format,
+                    model="summarize-xlarge"
                 )
-                st.success("Response:")
-                st.write(response.text.strip())
+                st.success("Summary:")
+                st.write(response.summary)
             except Exception as e:
                 st.error(f"Error: {str(e)}")
